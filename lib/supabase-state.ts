@@ -1,0 +1,57 @@
+import type { AppData } from "./types";
+import { normalizeData } from "./storage";
+
+function getConfig() {
+  const url = process.env.SUPABASE_URL?.replace(/\/$/, "");
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const stateId = process.env.APP_STATE_ID || "default";
+  return { url, key, stateId, configured: Boolean(url && key) };
+}
+
+export function isCloudConfigured() {
+  return getConfig().configured;
+}
+
+async function supabaseRequest(path: string, init: RequestInit = {}) {
+  const { url, key } = getConfig();
+  if (!url || !key) throw new Error("Supabase no está configurado.");
+
+  const response = await fetch(`${url}/rest/v1/${path}`, {
+    ...init,
+    headers: {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      "Content-Type": "application/json",
+      ...(init.headers || {}),
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(text || `Error Supabase ${response.status}`);
+  }
+
+  if (response.status === 204) return null;
+  return response.json();
+}
+
+export async function readCloudState(): Promise<AppData | null> {
+  const { stateId } = getConfig();
+  const result = (await supabaseRequest(`finance_app_state?id=eq.${encodeURIComponent(stateId)}&select=data&limit=1`)) as { data: AppData }[];
+  return result?.[0]?.data ? normalizeData(result[0].data) : null;
+}
+
+export async function writeCloudState(data: AppData) {
+  const { stateId } = getConfig();
+  const payload = {
+    id: stateId,
+    data,
+    updated_at: new Date().toISOString(),
+  };
+  await supabaseRequest("finance_app_state", {
+    method: "POST",
+    headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+    body: JSON.stringify(payload),
+  });
+}
