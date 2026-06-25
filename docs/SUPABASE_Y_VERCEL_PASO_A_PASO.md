@@ -1,83 +1,61 @@
-# Guía sin programar: Supabase + Vercel
+# Guía fácil: Supabase + Vercel para Eco-Clean
 
-## Qué es Supabase en esta app
+Esta guía está pensada para hacerlo sin saber programar.
 
-Supabase será la nube donde se guardan los datos de Eco-Clean: movimientos, deudas, categorías, etiquetas y configuración.
+## 1. Qué es Supabase
 
-No vas a programar ahí. Solo vas a crear un proyecto, pegar un SQL y copiar dos datos para Vercel.
+Supabase será la nube/base de datos de Eco-Clean. La app guarda ahí todos los movimientos, deudas, categorías, etiquetas, metas y métodos de pago.
 
-## Paso 1: crear Supabase
+## 2. Crear la tabla en Supabase
 
-1. Entra a Supabase.
-2. Crea una cuenta o inicia sesión.
-3. Presiona `New project`.
-4. Nombre sugerido del proyecto: `eco-clean-financiero`.
-5. Crea una contraseña para la base de datos. Guárdala por si Supabase la pide después.
-6. Region: elige la más cercana disponible. Si no sabes, deja la recomendada.
-7. Presiona `Create new project`.
-8. Espera a que termine de crear el proyecto.
+1. Entra a tu proyecto de Supabase.
+2. En el menú izquierdo, entra a **SQL Editor**.
+3. Abre el archivo `docs/supabase-schema.sql` de este proyecto.
+4. Copia todo el contenido.
+5. Pégalo en SQL Editor.
+6. Da clic en **Run**.
 
-## Paso 2: crear la tabla
+Con eso queda creada la tabla que usa la app.
 
-1. Dentro del proyecto de Supabase, abre `SQL Editor`.
-2. Presiona `New query`.
-3. Copia todo el contenido de este archivo: `docs/supabase-schema.sql`.
-4. Pégalo en Supabase.
-5. Presiona `Run`.
-
-Con eso queda creada la tabla donde la app guardará todo.
-
-## Paso 3: copiar los datos que necesita Vercel
-
-En Supabase abre `Project Settings` > `API`.
-
-Copia estos dos datos:
-
-1. `Project URL`
-2. `service_role key`
-
-Importante: usa `service_role key`, no `anon public`.
-
-La `service_role key` es privada. No la subas a GitHub, no la pegues en chats públicos y no la pongas dentro del código.
-
-## Paso 4: variables en Vercel
+## 3. Variables que van en Vercel
 
 Cuando importes el proyecto en Vercel, entra a:
 
-`Settings` > `Environment Variables`
+**Project > Settings > Environment Variables**
 
-Agrega estas variables:
+Agrega estas 5 variables, una por una:
 
-```env
-APP_PASSWORD=EcoClean2026*
-APP_SESSION_SECRET=eco-clean-frase-larga-cambiala-por-otra-muy-larga
-SUPABASE_URL=pega-aqui-el-Project-URL-de-Supabase
-SUPABASE_SERVICE_ROLE_KEY=pega-aqui-la-service-role-key-de-Supabase
-APP_STATE_ID=eco-clean
-```
+| Name | Value |
+|---|---|
+| `APP_PASSWORD` | la contraseña temporal de acceso, por ejemplo `EcoClean2026*` |
+| `APP_SESSION_SECRET` | una frase larga cualquiera, por ejemplo `eco-clean-juan-jose-sesion-segura-2026-cambiar` |
+| `SUPABASE_URL` | el API URL o Project URL de Supabase |
+| `SUPABASE_SECRET_KEY` | la Secret Key de Supabase |
+| `APP_STATE_ID` | `eco-clean` |
 
-Después presiona `Redeploy` o vuelve a desplegar.
+Importante: la Secret Key no va en GitHub. Solo va en Vercel.
 
-## Paso 5: probar
+## 4. Sobre el API URL
 
-1. Abre la URL que te dé Vercel.
-2. Entra con la contraseña que pusiste en `APP_PASSWORD`.
-3. Ve a Configuración.
-4. Presiona `Dejar en blanco` si quieres empezar limpio.
-5. Agrega categorías, etiquetas y métodos de pago según necesite Juan José.
-6. Registra una venta de prueba.
-7. Abre la app desde otro dispositivo. Si ves lo mismo, Supabase quedó bien configurado.
+Supabase puede mostrarte algo como:
 
-## Datos que me puedes pasar sin riesgo
+`https://xxxx.supabase.co/rest/v1/`
 
-Puedes pasarme:
+Puedes pegarlo tal cual en `SUPABASE_URL`. La app ya lo limpia automáticamente.
 
-- Project URL de Supabase.
-- Nombre del proyecto.
-- APP_STATE_ID.
+## 5. Publicar
 
-No es ideal que me pases la service_role key. Esa pégala tú directamente en Vercel.
+Después de poner las variables:
 
-## Qué NO debes subir a GitHub
+1. Guarda los cambios.
+2. Ve a **Deployments**.
+3. Da clic en **Redeploy**.
+4. Cuando termine, abre la URL de Vercel.
 
-No subas archivos `.env`, `.env.local` ni capturas donde se vea la service_role key.
+## 6. Prueba rápida
+
+1. Entra con la contraseña.
+2. Registra una venta de prueba por $100.
+3. Cierra la app.
+4. Ábrela en otro navegador o celular.
+5. Si la venta aparece, Supabase quedó funcionando.

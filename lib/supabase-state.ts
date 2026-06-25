@@ -1,9 +1,20 @@
 import type { AppData } from "./types";
 import { normalizeData } from "./storage";
 
+function normalizeSupabaseUrl(value?: string) {
+  if (!value) return undefined;
+  // Supabase sometimes shows either:
+  // 1) Project URL: https://xxxx.supabase.co
+  // 2) API URL:     https://xxxx.supabase.co/rest/v1/
+  // The app accepts both to avoid configuration mistakes.
+  return value.trim().replace(/\/+$/, "").replace(/\/rest\/v1$/, "");
+}
+
 function getConfig() {
-  const url = process.env.SUPABASE_URL?.replace(/\/$/, "");
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = normalizeSupabaseUrl(process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL);
+  // Supabase new secret keys replace the legacy service_role key.
+  // The app accepts both variable names for easier setup.
+  const key = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
   const stateId = process.env.APP_STATE_ID || "default";
   return { url, key, stateId, configured: Boolean(url && key) };
 }
