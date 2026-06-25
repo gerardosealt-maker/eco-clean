@@ -1,0 +1,11 @@
+node_modules
+.next
+.env
+.env.local
+.env*.local
+.vercel
+.DS_Store
+*.zip
+package-lock.json
+npm-debug.log*
+pnpm-debug.log*
